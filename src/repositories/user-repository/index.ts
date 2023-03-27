@@ -1,6 +1,5 @@
 import { prisma } from "@/config";
 import { CreateUserParams } from "@/schemas";
-import { Prisma } from "@prisma/client";
 
 async function findByEmail(email: string) {
     return prisma.user.findUnique({
