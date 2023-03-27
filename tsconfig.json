@@ -16,7 +16,8 @@
             {
                 "transform": "typescript-transform-paths"
             }
-        ]
+        ],
+        "strict": true
     },
     "include": ["src", "tests", "src/schemas/authentication-schemas.ts"]
 }
