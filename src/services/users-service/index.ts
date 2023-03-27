@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { duplicatedEmailError } from "./errors";
 
 export async function createUser({
+    name,
     email,
     password,
 }: CreateUserParams): Promise<User> {
@@ -12,6 +13,7 @@ export async function createUser({
 
     const hashedPassword = await bcrypt.hash(password, 12);
     return userRepository.create({
+        name,
         email,
         password: hashedPassword,
     });

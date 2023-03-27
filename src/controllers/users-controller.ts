@@ -2,12 +2,13 @@ import userService from "@/services/users-service";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { ApplicationError, isApplicationError } from "@/errors/protocols";
+import { CreateUserParams } from "@/schemas";
 
 export async function postUser(req: Request, res: Response) {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body as CreateUserParams;
 
     try {
-        await userService.createUser({ email, password });
+        await userService.createUser({ name, email, password });
         return res.sendStatus(httpStatus.CREATED);
     } catch (err) {
         if (isApplicationError(err as Error)) {
@@ -17,7 +18,6 @@ export async function postUser(req: Request, res: Response) {
             }
         }
 
-        console.log(err);
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }
