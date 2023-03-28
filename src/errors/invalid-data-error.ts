@@ -3,7 +3,7 @@ import { ApplicationError } from "./protocols";
 export function invalidDataError(details: string[]): InvalidateDataError {
     return {
         name: "InvalidDataError",
-        message: "Invalid data",
+        message: "Dado inválido!",
         details,
     };
 }
