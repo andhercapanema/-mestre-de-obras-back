@@ -1,11 +1,13 @@
 import { Router } from "express";
-
+import { authenticateToken, validateBody } from "@/middlewares";
 import { createUserSchema } from "@/schemas";
-import { validateBody } from "@/middlewares";
-import { postUser } from "@/controllers";
+import { getUserInfo, postUser } from "@/controllers";
 
 const usersRouter = Router();
 
-usersRouter.post("/", validateBody(createUserSchema), postUser);
+usersRouter
+    .post("/", validateBody(createUserSchema), postUser)
+    .all("/*", authenticateToken)
+    .get("/", getUserInfo);
 
 export { usersRouter };
