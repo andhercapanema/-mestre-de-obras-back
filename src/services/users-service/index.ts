@@ -1,3 +1,4 @@
+import { notFoundError } from "@/errors";
 import userRepository from "@/repositories/user-repository";
 import { CreateUserParams } from "@/schemas";
 import { User } from "@prisma/client";
@@ -27,8 +28,20 @@ async function validateUniqueEmail(email: string) {
     }
 }
 
+async function getUser(userId: number) {
+    const userInfo = await userRepository.findById(userId);
+
+    if (!userInfo) throw notFoundError("usuário");
+
+    return {
+        name: userInfo.name,
+        email: userInfo.email,
+    };
+}
+
 const userService = {
     createUser,
+    getUser,
 };
 
 export default userService;

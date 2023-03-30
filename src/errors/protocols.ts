@@ -3,6 +3,9 @@ export type ApplicationError = {
     message: string;
 };
 
-export function isApplicationError(err: Error): err is ApplicationError {
-    return typeof err.name === "string" && typeof err.message === "string";
+export function isApplicationError(err: unknown): err is ApplicationError {
+    return (
+        typeof (err as ApplicationError).name === "string" &&
+        typeof (err as ApplicationError).message === "string"
+    );
 }
