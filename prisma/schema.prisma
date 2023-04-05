@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(255)
-  email     String    @unique @db.VarChar(255)
-  password  String    @db.VarChar(255)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Session   Session[]
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  email            String             @unique @db.VarChar(255)
+  password         String             @db.VarChar(255)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Session          Session[]
+  UserConstruction UserConstruction[]
 
   @@map("users")
 }
@@ -31,4 +32,31 @@ model Session {
   User      User     @relation(fields: [userId], references: [id])
 
   @@map("sessions")
+}
+
+model Construction {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar(255)
+  address          String
+  client           String
+  technicalManager String
+  initialDate      DateTime
+  endDate          DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  UserConstruction UserConstruction[]
+
+  @@map("constructions")
+}
+
+model UserConstruction {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  constructionId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  User           User         @relation(fields: [userId], references: [id])
+  Construction   Construction @relation(fields: [constructionId], references: [id])
+
+  @@map("users_constructions")
 }

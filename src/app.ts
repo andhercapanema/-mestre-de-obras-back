@@ -3,7 +3,11 @@
 import express, { Express } from "express";
 import cors from "cors";
 import { loadEnv, connectDb, disconnectDB } from "@/config";
-import { authenticationRouter, usersRouter } from "./routers";
+import {
+    authenticationRouter,
+    constructionsRouter,
+    usersRouter,
+} from "./routers";
 
 loadEnv();
 
@@ -12,7 +16,8 @@ app.use(cors())
     .use(express.json())
     .get("/health", (_req, res) => res.send("OK!"))
     .use("/users", usersRouter)
-    .use("/auth", authenticationRouter);
+    .use("/auth", authenticationRouter)
+    .use("/constructions", constructionsRouter);
 
 export function init(): Promise<Express> {
     connectDb();
