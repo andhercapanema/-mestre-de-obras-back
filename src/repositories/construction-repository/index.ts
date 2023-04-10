@@ -13,9 +13,22 @@ async function findByName(name: string) {
     });
 }
 
+async function findByUserId(userId: number) {
+    return prisma.construction.findMany({
+        where: {
+            UserConstruction: {
+                some: {
+                    userId,
+                },
+            },
+        },
+    });
+}
+
 const constructionRepository = {
     create,
     findByName,
+    findByUserId,
 };
 
 export default constructionRepository;

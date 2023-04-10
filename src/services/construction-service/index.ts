@@ -1,10 +1,11 @@
 import { CreateConstructionParams } from "@/schemas";
 import constructionRepository from "@/repositories/construction-repository";
-import { exclude } from "@/utils/prisma-utils";
 import { conflictError } from "@/errors";
+import userConstructionRepository from "@/repositories/user-construction-repository";
 
 async function postConstruction(
-    createConstructionParams: CreateConstructionParams
+    createConstructionParams: CreateConstructionParams,
+    userId: number
 ) {
     const dbConstruction = await constructionRepository.findByName(
         createConstructionParams.name
@@ -17,13 +18,22 @@ async function postConstruction(
         createConstructionParams
     );
 
+    await userConstructionRepository.create(userId, construction.id);
+
     return {
         constructionId: construction.id,
     };
 }
 
+async function getConstructions(userId: number) {
+    const constructions = await constructionRepository.findByUserId(userId);
+
+    return constructions;
+}
+
 const constructionService = {
     postConstruction,
+    getConstructions,
 };
 
 export default constructionService;
