@@ -1,8 +1,10 @@
 import { ApplicationError } from "./protocols";
 
-export function unauthorizedError(): ApplicationError {
+export function unauthorizedError(
+    message: string = "Você deve estar logado para continuar!"
+): ApplicationError {
     return {
         name: "UnauthorizedError",
-        message: "Você deve estar logado para continuar!",
+        message: message,
     };
 }
