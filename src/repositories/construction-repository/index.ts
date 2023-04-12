@@ -25,10 +25,31 @@ async function findByUserId(userId: number) {
     });
 }
 
+async function findById(id: number) {
+    return prisma.construction.findUnique({
+        where: { id },
+    });
+}
+
+async function findByIdAndUserId(userId: number, id: number) {
+    return prisma.construction.findFirst({
+        where: {
+            id,
+            UserConstruction: {
+                some: {
+                    userId,
+                },
+            },
+        },
+    });
+}
+
 const constructionRepository = {
     create,
     findByName,
     findByUserId,
+    findById,
+    findByIdAndUserId,
 };
 
 export default constructionRepository;

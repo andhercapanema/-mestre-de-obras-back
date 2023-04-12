@@ -1,6 +1,6 @@
 import { CreateConstructionParams } from "@/schemas";
 import constructionRepository from "@/repositories/construction-repository";
-import { conflictError } from "@/errors";
+import { conflictError, notFoundError, unauthorizedError } from "@/errors";
 import userConstructionRepository from "@/repositories/user-construction-repository";
 
 async function postConstruction(
@@ -20,9 +20,7 @@ async function postConstruction(
 
     await userConstructionRepository.create(userId, construction.id);
 
-    return {
-        constructionId: construction.id,
-    };
+    return construction;
 }
 
 async function getConstructions(userId: number) {
@@ -31,9 +29,26 @@ async function getConstructions(userId: number) {
     return constructions;
 }
 
+async function getConstructionById(userId: number, constructionId: number) {
+    const construction = await constructionRepository.findById(constructionId);
+
+    if (!construction) throw notFoundError("obra");
+
+    const userConstruction = await constructionRepository.findByIdAndUserId(
+        userId,
+        constructionId
+    );
+
+    if (!userConstruction)
+        throw unauthorizedError("O usuário logado não tem acesso a essa obra!");
+
+    return userConstruction;
+}
+
 const constructionService = {
     postConstruction,
     getConstructions,
+    getConstructionById,
 };
 
 export default constructionService;
