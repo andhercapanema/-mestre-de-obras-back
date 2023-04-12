@@ -30,25 +30,60 @@ async function getConstructions(userId: number) {
 }
 
 async function getConstructionById(userId: number, constructionId: number) {
-    const construction = await constructionRepository.findById(constructionId);
+    const dbConstruction = await constructionRepository.findById(
+        constructionId
+    );
 
-    if (!construction) throw notFoundError("obra");
+    if (!dbConstruction) throw notFoundError("obra");
 
-    const userConstruction = await constructionRepository.findByIdAndUserId(
+    const construction = await constructionRepository.findByIdAndUserId(
         userId,
         constructionId
     );
 
-    if (!userConstruction)
+    if (!construction)
         throw unauthorizedError("O usuário logado não tem acesso a essa obra!");
 
-    return userConstruction;
+    return construction;
+}
+
+async function updateConstruction(
+    createConstructionParams: CreateConstructionParams,
+    userId: number,
+    constructionId: number
+) {
+    const dbConstructionByName = await constructionRepository.findByName(
+        createConstructionParams.name
+    );
+
+    if (dbConstructionByName && constructionId !== dbConstructionByName.id)
+        throw conflictError("Já existe uma obra cadastrada com esse nome!");
+
+    const dbConstructionById = await constructionRepository.findById(
+        constructionId
+    );
+
+    if (!dbConstructionById) throw notFoundError("obra");
+
+    const dbConstructionIsAccessible =
+        await constructionRepository.findByIdAndUserId(userId, constructionId);
+
+    if (!dbConstructionIsAccessible)
+        throw unauthorizedError("O usuário logado não tem acesso a essa obra!");
+
+    const construction = await constructionRepository.update(
+        constructionId,
+        createConstructionParams
+    );
+
+    return construction;
 }
 
 const constructionService = {
     postConstruction,
     getConstructions,
     getConstructionById,
+    updateConstruction,
 };
 
 export default constructionService;

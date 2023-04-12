@@ -5,6 +5,7 @@ import {
     getConstructionById,
     getConstructions,
     postConstruction,
+    updateConstruction,
 } from "@/controllers";
 
 const constructionsRouter = Router();
@@ -13,6 +14,7 @@ constructionsRouter
     .all("/*", authenticateToken)
     .post("/", validateBody(createConstructionSchema), postConstruction)
     .get("/", getConstructions)
-    .get("/:id", getConstructionById);
+    .get("/:id", getConstructionById)
+    .patch("/:id", validateBody(createConstructionSchema), updateConstruction);
 
 export { constructionsRouter };

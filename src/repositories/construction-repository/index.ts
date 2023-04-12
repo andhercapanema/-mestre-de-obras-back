@@ -44,12 +44,22 @@ async function findByIdAndUserId(userId: number, id: number) {
     });
 }
 
+async function update(id: number, data: CreateConstructionParams) {
+    return prisma.construction.update({
+        where: {
+            id,
+        },
+        data,
+    });
+}
+
 const constructionRepository = {
     create,
     findByName,
     findByUserId,
     findById,
     findByIdAndUserId,
+    update,
 };
 
 export default constructionRepository;

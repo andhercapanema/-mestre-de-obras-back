@@ -84,3 +84,46 @@ export async function getConstructionById(
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }
+
+export async function updateConstruction(
+    req: AuthenticatedRequest,
+    res: Response
+) {
+    const { name, address, client, technicalManager, initialDate, endDate } =
+        req.body as CreateConstructionParams;
+    const { userId } = req;
+    const { id } = req.params;
+
+    try {
+        const construction = await constructionService.updateConstruction(
+            {
+                name,
+                address,
+                client,
+                technicalManager,
+                initialDate,
+                endDate,
+            },
+            Number(userId),
+            Number(id)
+        );
+
+        return res.status(httpStatus.OK).send(construction);
+    } catch (err) {
+        if (isApplicationError(err as Error)) {
+            const { name, message } = err as ApplicationError;
+            if (name === "ConflictError") {
+                return res.status(httpStatus.CONFLICT).send(message);
+            }
+            if (name === "NotFoundError") {
+                return res.status(httpStatus.NOT_FOUND).send(message);
+            }
+            if (name === "UnauthorizedError") {
+                return res.status(httpStatus.UNAUTHORIZED).send(message);
+            }
+        }
+
+        console.log(err);
+        return res.status(httpStatus.BAD_REQUEST).send(err);
+    }
+}
