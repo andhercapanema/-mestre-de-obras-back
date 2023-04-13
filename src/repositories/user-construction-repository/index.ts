@@ -9,8 +9,17 @@ async function create(userId: number, constructionId: number) {
     });
 }
 
+async function deleteByConstructionId(constructionId: number) {
+    return prisma.userConstruction.deleteMany({
+        where: {
+            constructionId,
+        },
+    });
+}
+
 const userConstructionRepository = {
     create,
+    deleteByConstructionId,
 };
 
 export default userConstructionRepository;

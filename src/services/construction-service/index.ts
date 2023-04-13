@@ -3,16 +3,32 @@ import constructionRepository from "@/repositories/construction-repository";
 import { conflictError, notFoundError, unauthorizedError } from "@/errors";
 import userConstructionRepository from "@/repositories/user-construction-repository";
 
+async function checkIfConstructionParamsHasConflits(
+    createConstructionParams: CreateConstructionParams,
+    method: "post" | "update",
+    constructionId = 0
+) {
+    const dbConstructionByName = await constructionRepository.findByName(
+        createConstructionParams.name
+    );
+
+    if (!dbConstructionByName) return;
+
+    if (
+        method === "post" ||
+        (method === "update" && constructionId !== dbConstructionByName.id)
+    )
+        throw conflictError("Já existe uma obra cadastrada com esse nome!");
+}
+
 async function postConstruction(
     createConstructionParams: CreateConstructionParams,
     userId: number
 ) {
-    const dbConstruction = await constructionRepository.findByName(
-        createConstructionParams.name
+    await checkIfConstructionParamsHasConflits(
+        createConstructionParams,
+        "post"
     );
-
-    if (dbConstruction)
-        throw conflictError("Já existe uma obra cadastrada com esse nome!");
 
     const construction = await constructionRepository.create(
         createConstructionParams
@@ -24,18 +40,21 @@ async function postConstruction(
 }
 
 async function getConstructions(userId: number) {
-    const constructions = await constructionRepository.findByUserId(userId);
-
-    return constructions;
+    return await constructionRepository.findByUserId(userId);
 }
 
-async function getConstructionById(userId: number, constructionId: number) {
+async function checkConstructionOnDb(constructionId: number) {
     const dbConstruction = await constructionRepository.findById(
         constructionId
     );
 
     if (!dbConstruction) throw notFoundError("obra");
+}
 
+async function getConstructionIfUserHasAccess(
+    userId: number,
+    constructionId: number
+) {
     const construction = await constructionRepository.findByIdAndUserId(
         userId,
         constructionId
@@ -47,29 +66,30 @@ async function getConstructionById(userId: number, constructionId: number) {
     return construction;
 }
 
+async function getConstructionById(userId: number, constructionId: number) {
+    await checkConstructionOnDb(constructionId);
+
+    const construction = await getConstructionIfUserHasAccess(
+        userId,
+        constructionId
+    );
+
+    return construction;
+}
+
 async function updateConstruction(
     createConstructionParams: CreateConstructionParams,
     userId: number,
     constructionId: number
 ) {
-    const dbConstructionByName = await constructionRepository.findByName(
-        createConstructionParams.name
+    await checkIfConstructionParamsHasConflits(
+        createConstructionParams,
+        "update"
     );
 
-    if (dbConstructionByName && constructionId !== dbConstructionByName.id)
-        throw conflictError("Já existe uma obra cadastrada com esse nome!");
+    await checkConstructionOnDb(constructionId);
 
-    const dbConstructionById = await constructionRepository.findById(
-        constructionId
-    );
-
-    if (!dbConstructionById) throw notFoundError("obra");
-
-    const dbConstructionIsAccessible =
-        await constructionRepository.findByIdAndUserId(userId, constructionId);
-
-    if (!dbConstructionIsAccessible)
-        throw unauthorizedError("O usuário logado não tem acesso a essa obra!");
+    await getConstructionIfUserHasAccess(userId, constructionId);
 
     const construction = await constructionRepository.update(
         constructionId,
@@ -79,11 +99,21 @@ async function updateConstruction(
     return construction;
 }
 
+async function deleteConstruction(userId: number, constructionId: number) {
+    await checkConstructionOnDb(constructionId);
+
+    await getConstructionIfUserHasAccess(userId, constructionId);
+
+    await userConstructionRepository.deleteByConstructionId(constructionId);
+    await constructionRepository.deleteById(constructionId);
+}
+
 const constructionService = {
     postConstruction,
     getConstructions,
     getConstructionById,
     updateConstruction,
+    deleteConstruction,
 };
 
 export default constructionService;
