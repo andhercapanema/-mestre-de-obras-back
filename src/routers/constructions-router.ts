@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authenticateToken, validateBody } from "@/middlewares";
 import { createConstructionSchema } from "@/schemas";
 import {
+    deleteConstructionById,
     getConstructionById,
     getConstructions,
     postConstruction,
@@ -15,6 +16,7 @@ constructionsRouter
     .post("/", validateBody(createConstructionSchema), postConstruction)
     .get("/", getConstructions)
     .get("/:id", getConstructionById)
-    .patch("/:id", validateBody(createConstructionSchema), updateConstruction);
+    .patch("/:id", validateBody(createConstructionSchema), updateConstruction)
+    .delete("/:id", deleteConstructionById);
 
 export { constructionsRouter };

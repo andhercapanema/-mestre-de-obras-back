@@ -127,3 +127,32 @@ export async function updateConstruction(
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }
+
+export async function deleteConstructionById(
+    req: AuthenticatedRequest,
+    res: Response
+) {
+    const { userId } = req;
+    const { id } = req.params;
+
+    try {
+        await constructionService.deleteConstruction(
+            Number(userId),
+            Number(id)
+        );
+
+        return res.sendStatus(httpStatus.OK);
+    } catch (err) {
+        if (isApplicationError(err as Error)) {
+            const { name, message } = err as ApplicationError;
+            if (name === "NotFoundError") {
+                return res.status(httpStatus.NOT_FOUND).send(message);
+            }
+            if (name === "UnauthorizedError") {
+                return res.status(httpStatus.UNAUTHORIZED).send(message);
+            }
+        }
+
+        return res.status(httpStatus.BAD_REQUEST).send(err);
+    }
+}

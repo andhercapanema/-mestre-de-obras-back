@@ -53,6 +53,14 @@ async function update(id: number, data: CreateConstructionParams) {
     });
 }
 
+async function deleteById(id: number) {
+    return prisma.construction.delete({
+        where: {
+            id,
+        },
+    });
+}
+
 const constructionRepository = {
     create,
     findByName,
@@ -60,6 +68,7 @@ const constructionRepository = {
     findById,
     findByIdAndUserId,
     update,
+    deleteById,
 };
 
 export default constructionRepository;
