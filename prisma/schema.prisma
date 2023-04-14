@@ -45,6 +45,8 @@ model Construction {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   UserConstruction UserConstruction[]
+  Stock            Stock[]
+  MinimumStock     MinimumStock[]
 
   @@map("constructions")
 }
@@ -59,4 +61,43 @@ model UserConstruction {
   Construction   Construction @relation(fields: [constructionId], references: [id])
 
   @@map("users_constructions")
+}
+
+model Material {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Stock        Stock[]
+  MinimumStock MinimumStock[]
+
+  @@map("materials")
+}
+
+model Stock {
+  id             Int          @id @default(autoincrement())
+  constructionId Int
+  materialId     Int
+  amount         Int
+  price          Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  Construction   Construction @relation(fields: [constructionId], references: [id])
+  Material       Material     @relation(fields: [materialId], references: [id])
+
+  @@map("stocks")
+}
+
+model MinimumStock {
+  id             Int          @id @default(autoincrement())
+  constructionId Int
+  materialId     Int
+  minAmount      Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  Construction   Construction @relation(fields: [constructionId], references: [id])
+  Material       Material     @relation(fields: [materialId], references: [id])
+
+  @@unique([constructionId, materialId])
+  @@map("minimum_stocks")
 }
