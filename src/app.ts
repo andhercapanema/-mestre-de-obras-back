@@ -6,6 +6,7 @@ import { loadEnv, connectDb, disconnectDB } from "@/config";
 import {
     authenticationRouter,
     constructionsRouter,
+    materialsRouter,
     usersRouter,
 } from "./routers";
 
@@ -17,7 +18,8 @@ app.use(cors())
     .get("/health", (_req, res) => res.send("OK!"))
     .use("/users", usersRouter)
     .use("/auth", authenticationRouter)
-    .use("/constructions", constructionsRouter);
+    .use("/constructions", constructionsRouter)
+    .use("/materials", materialsRouter);
 
 export function init(): Promise<Express> {
     connectDb();
