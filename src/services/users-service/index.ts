@@ -5,6 +5,14 @@ import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { duplicatedEmailError } from "./errors";
 
+async function validateUniqueEmail(email: string) {
+    const userWithSameEmail = await userRepository.findByEmail(email);
+
+    if (userWithSameEmail) {
+        throw duplicatedEmailError();
+    }
+}
+
 export async function createUser({
     name,
     email,
@@ -20,18 +28,8 @@ export async function createUser({
     });
 }
 
-async function validateUniqueEmail(email: string) {
-    const userWithSameEmail = await userRepository.findByEmail(email);
-
-    if (userWithSameEmail) {
-        throw duplicatedEmailError();
-    }
-}
-
 async function getUser(userId: number) {
-    const userInfo = await userRepository.findById(userId);
-
-    if (!userInfo) throw notFoundError("usuário");
+    const userInfo = (await userRepository.findById(userId)) as User; // if it was null, would throw unauthorizedError in authentication-middleware
 
     return {
         name: userInfo.name,

@@ -4,6 +4,7 @@ import { LoginParams } from "@/schemas";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { invalidCredentialsError } from "./errors";
+import { enviromentVariableError } from "@/errors";
 
 async function signIn(loginParams: LoginParams) {
     const { email, password } = loginParams;
@@ -31,7 +32,7 @@ async function getUser(email: string) {
 }
 
 async function createSession(userId: number) {
-    if (!process.env.JWT_SECRET) throw Error("Undefined JWT_SECRET");
+    if (!process.env.JWT_SECRET) throw enviromentVariableError("JWT_SECRET");
 
     const token = jwt.sign({ userId }, process.env.JWT_SECRET);
     await sessionRepository.create(token, userId);
