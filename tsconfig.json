@@ -19,5 +19,10 @@
         ],
         "strict": true
     },
-    "include": ["src", "tests", "src/schemas/authentication-schemas.ts"]
+    "include": [
+        "src",
+        "tests",
+        "src/schemas/authentication-schemas.ts",
+        "jest.config.js"
+    ]
 }

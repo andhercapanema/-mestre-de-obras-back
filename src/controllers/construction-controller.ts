@@ -123,7 +123,6 @@ export async function updateConstruction(
             }
         }
 
-        console.log(err);
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }

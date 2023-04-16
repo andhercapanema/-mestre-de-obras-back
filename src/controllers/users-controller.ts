@@ -1,7 +1,7 @@
 import userService from "@/services/users-service";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import { ApplicationError, isApplicationError } from "@/errors/protocols";
+import { isApplicationError } from "@/errors/protocols";
 import { CreateUserParams } from "@/schemas";
 import { AuthenticatedRequest } from "@/middlewares";
 
@@ -27,17 +27,10 @@ export async function getUserInfo(req: AuthenticatedRequest, res: Response) {
     const { userId } = req;
 
     try {
-        const userInfo = await userService.getUser(userId ?? 0);
+        const userInfo = await userService.getUser(Number(userId));
 
         return res.status(httpStatus.OK).send(userInfo);
     } catch (err) {
-        if (isApplicationError(err)) {
-            const { name, message } = err;
-            if (name === "NotFoundError") {
-                return res.status(httpStatus.NOT_FOUND).send(message);
-            }
-        }
-
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }

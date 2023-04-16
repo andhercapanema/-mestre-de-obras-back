@@ -25,8 +25,6 @@ function validate(
             next();
         } catch (err) {
             if (err instanceof ZodError) {
-                console.log(err);
-
                 res.status(httpStatus.BAD_REQUEST).send(
                     invalidDataError(
                         err.issues.map(
