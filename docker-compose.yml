@@ -1,0 +1,33 @@
+services:
+    postgres:
+        image: postgres
+        container_name: postgres
+        networks:
+            - mestre-de-obras-network
+        ports:
+            - 5433:5432
+        env_file:
+            - .env
+        volumes:
+            - postgres-volume:/var/lib/postgresql/data
+
+    node:
+        container_name: node
+        build: .
+        image: mestre-de-obras/backend
+        networks:
+            - mestre-de-obras-network
+        ports:
+            - 5000:5000
+        depends_on:
+            - postgres
+        env_file:
+            - .env
+
+networks:
+    mestre-de-obras-network:
+        name: mestre-de-obras-network
+        driver: bridge
+
+volumes:
+    postgres-volume:
