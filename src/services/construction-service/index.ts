@@ -84,7 +84,8 @@ async function updateConstruction(
 ) {
     await checkIfConstructionParamsHasConflits(
         createConstructionParams,
-        "update"
+        "update",
+        constructionId
     );
 
     await checkConstructionOnDb(constructionId);
