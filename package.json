@@ -4,10 +4,16 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "build": "tsc -p tsconfig.build.json",
         "dev": "NODE_ENV=development nodemon --watch 'src/' --exec 'ts-node -r tsconfig-paths/register ./src/server.ts' -e ts",
         "dev:load-envs": "dotenv -e .env.development",
         "dev:migration:generate": "npm run dev:load-envs prisma migrate dev",
-        "test": "NODE_ENV=test jest --passWithNoTests --runInBand",
+        "start": "npm run prisma:migrate:deploy && node dist/server.js",
+        "prepare": "ts-patch install -s",
+        "prisma:migrate:deploy": "prisma migrate deploy",
+        "prod:load-envs": "dotenv -e .env",
+        "test": "npm run test:migration:run && NODE_ENV=test jest --passWithNoTests --runInBand",
+        "test:dev": "NODE_ENV=test jest --passWithNoTests --runInBand",
         "test:coverage": "NODE_ENV=test jest --passWithNoTests --runInBand --coverage --collectCoverageFrom='./src/**'",
         "test:load-envs": "dotenv -e .env.test",
         "test:migration:run": "npm run test:load-envs prisma migrate deploy",
@@ -38,8 +44,9 @@
         "supertest": "^6.3.3",
         "ts-jest": "^29.1.0",
         "ts-node": "^10.9.1",
+        "ts-patch": "^2.1.0",
         "tsconfig-paths": "^4.1.2",
-        "typescript": "^5.0.2",
+        "typescript": "^4.9.5",
         "typescript-transform-paths": "^3.4.6"
     },
     "dependencies": {
