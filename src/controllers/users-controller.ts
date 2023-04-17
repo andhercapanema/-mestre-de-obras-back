@@ -19,6 +19,7 @@ export async function postUser(req: Request, res: Response) {
             }
         }
 
+        console.log(err);
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }
