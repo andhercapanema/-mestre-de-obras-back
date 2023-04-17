@@ -14,6 +14,7 @@ jobs:
                   envkey_POSTGRES_PASSWORD: "postgres"
                   envkey_POSTGRES_DB: "mestre-de-obras_test"
                   envkey_DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/mestre-de-obras_test"
+                  envkey_JWT_SECRET: "senha-muito-secreta"
                   file_name: .env.test
             - name: Run tests
               run: docker compose -f docker-compose-test.yml run node npm run test
