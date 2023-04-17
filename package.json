@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "dev": "NODE_ENV=development nodemon --watch 'src/' --exec 'ts-node -r tsconfig-paths/register ./src/server.ts' -e ts",
+        "dev": "nodemon --watch 'src/' --exec 'ts-node -r tsconfig-paths/register -r dotenv-expand/config ./src/server.ts dotenv_config_path=.env.development' -e ts",
         "dev:load-envs": "dotenv -e .env.development",
         "dev:migration:generate": "npm run dev:load-envs prisma migrate dev",
         "start": "npm run prisma:migrate:deploy && node dist/server.js",
