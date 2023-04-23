@@ -1,7 +1,16 @@
 import { z } from "zod";
 
-export const createMaterialSchema = z.object({
+export const createUniqueMaterialSchema = z.object({
     name: z.string(),
+    unit: z.string(),
 });
 
-export type CreateMaterialParams = z.infer<typeof createMaterialSchema>;
+export type CreateUniqueMaterialParams = z.infer<
+    typeof createUniqueMaterialSchema
+>;
+
+export const createMaterialsSchema = z.object({
+    newMaterials: z.array(createUniqueMaterialSchema).nonempty(),
+});
+
+export type CreateMaterialsParams = z.infer<typeof createMaterialsSchema>;

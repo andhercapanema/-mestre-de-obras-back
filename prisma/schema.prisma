@@ -66,6 +66,7 @@ model UserConstruction {
 model Material {
   id           Int            @id @default(autoincrement())
   name         String         @unique @db.VarChar(255)
+  unit         String         @db.VarChar(255)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   Stock        Stock[]
@@ -74,12 +75,18 @@ model Material {
   @@map("materials")
 }
 
+enum StockStatus {
+  available
+  consumed
+}
+
 model Stock {
   id             Int          @id @default(autoincrement())
   constructionId Int
   materialId     Int
   amount         Int
   price          Int
+  status         StockStatus
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   Construction   Construction @relation(fields: [constructionId], references: [id])

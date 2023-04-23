@@ -22,7 +22,6 @@ function validate(
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             schema.parse(req[type]);
-            next();
         } catch (err) {
             if (err instanceof ZodError) {
                 res.status(httpStatus.BAD_REQUEST).send(
@@ -34,6 +33,8 @@ function validate(
                 );
             }
         }
+
+        next();
     };
 }
 

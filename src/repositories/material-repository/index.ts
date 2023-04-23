@@ -1,10 +1,20 @@
 import { prisma } from "@/config";
+import { CreateUniqueMaterialParams } from "@/schemas";
+import { Prisma, PrismaClient } from "@prisma/client";
 
-async function create(name: string) {
-    return prisma.material.create({
-        data: {
-            name,
-        },
+async function create(
+    prismaInstance: Omit<
+        PrismaClient<
+            Prisma.PrismaClientOptions,
+            never,
+            Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+        >,
+        "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
+    >,
+    createUniqueMaterialParams: CreateUniqueMaterialParams
+) {
+    return prismaInstance.material.create({
+        data: createUniqueMaterialParams,
     });
 }
 
