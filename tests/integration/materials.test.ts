@@ -82,20 +82,43 @@ describe("POST /materials", () => {
             expect(response.status).toEqual(httpStatus.BAD_REQUEST);
         });
 
+        it("should respond with status 409 when body has more than one material with the same name", async () => {
+            const token = await generateValidToken();
+            const name = faker.name.fullName();
+            const duplicatedNameBody = {
+                newMaterials: [1, 2].map(() => ({
+                    name,
+                    unit: faker.word.noun({ strategy: "shortest" }),
+                })),
+            };
+
+            const response = await server
+                .post("/materials")
+                .set("Authorization", `Bearer ${token}`)
+                .send(duplicatedNameBody);
+
+            expect(response.status).toEqual(httpStatus.CONFLICT);
+        });
+
         describe("when body is valid", () => {
-            const generateValidBody = () => ({
-                name: faker.name.fullName(),
+            const generateValidBody = (name?: string) => ({
+                newMaterials: [
+                    {
+                        name: name || faker.name.fullName(),
+                        unit: faker.word.noun({ strategy: "shortest" }),
+                    },
+                ],
             });
 
             it("should respond with status 409 when a material with given name already exists", async () => {
                 const token = await generateValidToken();
-                const body = generateValidBody();
                 const material = await createMaterial();
+                const sameNameBody = generateValidBody(material.name);
 
                 const response = await server
                     .post("/materials")
                     .set("Authorization", `Bearer ${token}`)
-                    .send({ ...body, name: material.name });
+                    .send(sameNameBody);
 
                 expect(response.status).toEqual(httpStatus.CONFLICT);
             });
@@ -111,10 +134,12 @@ describe("POST /materials", () => {
 
                 expect(response.status).toEqual(httpStatus.CREATED);
                 expect(response.body).toEqual(
-                    expect.objectContaining({
-                        id: 1,
-                        name: body.name,
-                    })
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            id: 1,
+                            name: body.newMaterials[0].name,
+                        }),
+                    ])
                 );
             });
 
@@ -139,7 +164,7 @@ describe("POST /materials", () => {
                 expect(material).toEqual(
                     expect.objectContaining({
                         id: 1,
-                        name: body.name,
+                        name: body.newMaterials[0].name,
                     })
                 );
             });

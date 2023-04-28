@@ -1,5 +1,8 @@
+import { prisma } from "@/config";
 import { conflictError } from "@/errors";
 import materialRepository from "@/repositories/material-repository";
+import { CreateMaterialsParams } from "@/schemas";
+import { Material } from "@prisma/client";
 
 async function checkIfMaterialParamsHasConflits(
     name: string,
@@ -14,15 +17,42 @@ async function checkIfMaterialParamsHasConflits(
         method === "post" ||
         (method === "update" && materialId !== dbMaterialByName.id)
     )
-        throw conflictError("Já existe um material cadastrado com esse nome!");
+        throw conflictError(
+            "Já existe um insumo cadastrado com esse(s) nome(s)!"
+        );
 }
 
-async function postMaterial(name: string) {
-    await checkIfMaterialParamsHasConflits(name, "post");
+async function postMaterial({ newMaterials }: CreateMaterialsParams) {
+    const hash: {
+        [key: string]: boolean;
+    } = {};
+    for (const material of newMaterials) {
+        const materialName = material.name;
 
-    const material = await materialRepository.create(name);
+        if (hash[materialName]) {
+            throw conflictError(
+                "Mais de um insumo sendo cadastrado com o mesmo nome! Apenas insumos com nomes únicos são aceitos!"
+            );
+        } else {
+            hash[materialName] = true;
+        }
 
-    return material;
+        await checkIfMaterialParamsHasConflits(materialName, "post");
+    }
+
+    return await prisma.$transaction(async (prismaInstance) => {
+        const createdMaterials: Material[] = [];
+
+        for (const material of newMaterials) {
+            const createdMaterial = await materialRepository.create(
+                prismaInstance,
+                material
+            );
+            createdMaterials.push(createdMaterial);
+        }
+
+        return createdMaterials;
+    });
 }
 
 async function getMaterials() {

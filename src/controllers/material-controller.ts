@@ -1,15 +1,15 @@
 import { ApplicationError, isApplicationError } from "@/errors/protocols";
 import { AuthenticatedRequest } from "@/middlewares";
-import { CreateMaterialParams } from "@/schemas";
+import { CreateMaterialsParams } from "@/schemas";
 import materialService from "@/services/material-service";
 import { Response } from "express";
 import httpStatus from "http-status";
 
 export async function postMaterial(req: AuthenticatedRequest, res: Response) {
-    const { name } = req.body as CreateMaterialParams;
+    const { newMaterials } = req.body as CreateMaterialsParams;
 
     try {
-        const material = await materialService.postMaterial(name);
+        const material = await materialService.postMaterial({ newMaterials });
 
         return res.status(httpStatus.CREATED).send(material);
     } catch (err) {
@@ -20,6 +20,7 @@ export async function postMaterial(req: AuthenticatedRequest, res: Response) {
             }
         }
 
+        console.log(err);
         return res.status(httpStatus.BAD_REQUEST).send(err);
     }
 }
